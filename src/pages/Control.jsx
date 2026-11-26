@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import { send } from '../lib/channel'
 import SongEditor from '../features/song/SongEditor'
 import SongPreview from '../features/song/SongPreview'
@@ -7,17 +8,24 @@ export default function Control() {
   const {
     sections,
     activeSection,
+    activationNonce,
     setActiveId,
     addSection,
     updateSection,
     removeSection,
   } = useSongSections()
 
+  useEffect(() => {
+    if (activeSection) {
+      send({ type: 'showText', text: activeSection.text })
+    }
+  }, [activeSection, activationNonce])
+
   return (
     <main style={{ padding: '2rem', fontFamily: 'sans-serif' }}>
       <h1>Control</h1>
-      <button type="button" onClick={() => send({ type: 'ping' })}>
-        Send ping
+      <button type="button" onClick={() => send({ type: 'clear' })}>
+        Clear
       </button>
 
       <h2>Song sections</h2>
