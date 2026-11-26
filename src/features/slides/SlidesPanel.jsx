@@ -1,12 +1,56 @@
-export default function SlidesPanel({ slides, activeIndex, onLoadFiles, onSelect }) {
+export default function SlidesPanel({
+  slides,
+  activeIndex,
+  onLoadFiles,
+  onSelect,
+  onLoadPptx,
+  pptxStatus,
+  pptxProgress,
+  pptxError,
+}) {
   return (
     <div>
-      <input
-        type="file"
-        accept="image/*"
-        multiple
-        onChange={(event) => onLoadFiles(event.target.files)}
-      />
+      <div>
+        <label>
+          Images:{' '}
+          <input
+            type="file"
+            accept="image/*"
+            multiple
+            onChange={(event) => onLoadFiles(event.target.files)}
+          />
+        </label>
+      </div>
+
+      <div style={{ marginTop: 8 }}>
+        <label>
+          PowerPoint (.pptx):{' '}
+          <input
+            type="file"
+            accept=".pptx,application/vnd.openxmlformats-officedocument.presentationml.presentation"
+            disabled={pptxStatus === 'loading'}
+            onChange={(event) => {
+              const file = event.target.files[0]
+              if (file) onLoadPptx(file)
+              event.target.value = ''
+            }}
+          />
+        </label>
+        <p style={{ color: '#666', fontSize: 13, margin: '4px 0 0' }}>
+          Best-effort preview — each slide is rendered and flattened into an image. Complex
+          layouts, animations, or unusual fonts may not look exactly like PowerPoint. For
+          anything critical, export the deck as images instead.
+        </p>
+        {pptxStatus === 'loading' && (
+          <p style={{ fontSize: 13 }}>
+            Converting slide {pptxProgress.done} of {pptxProgress.total || '…'}
+          </p>
+        )}
+        {pptxStatus === 'error' && (
+          <p style={{ color: '#c00', fontSize: 13 }}>Couldn't read that .pptx: {pptxError}</p>
+        )}
+      </div>
+
       <div
         style={{
           display: 'grid',

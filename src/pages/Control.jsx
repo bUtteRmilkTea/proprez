@@ -7,6 +7,7 @@ import { useSongs } from '../features/song/useSongs'
 import { BACKGROUNDS, DEFAULT_BACKGROUND } from '../features/background/backgrounds'
 import SlidesPanel from '../features/slides/SlidesPanel'
 import { useSlides } from '../features/slides/useSlides'
+import { usePptxImport } from '../features/slides/usePptxImport'
 
 export default function Control() {
   const [mode, setMode] = useState('song')
@@ -33,8 +34,16 @@ export default function Control() {
     activeSlide,
     activationNonce: slideActivationNonce,
     loadFiles,
+    loadRenderedSlides,
     setActiveIndex,
   } = useSlides({ enabled: mode === 'slides' })
+
+  const {
+    status: pptxStatus,
+    progress: pptxProgress,
+    error: pptxError,
+    importPptx,
+  } = usePptxImport()
 
   const [background, setBackground] = useState(DEFAULT_BACKGROUND)
   const [backgroundMode, setBackgroundModeState] = useState('generated')
@@ -181,6 +190,10 @@ export default function Control() {
             activeIndex={activeIndex}
             onLoadFiles={loadFiles}
             onSelect={setActiveIndex}
+            onLoadPptx={(file) => importPptx(file, loadRenderedSlides)}
+            pptxStatus={pptxStatus}
+            pptxProgress={pptxProgress}
+            pptxError={pptxError}
           />
         </>
       )}
