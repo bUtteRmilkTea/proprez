@@ -2,7 +2,8 @@ import { useEffect, useState } from 'react'
 import { send } from '../lib/channel'
 import SongEditor from '../features/song/SongEditor'
 import SongPreview from '../features/song/SongPreview'
-import { useSongSections } from '../features/song/useSongSections'
+import SongList from '../features/song/SongList'
+import { useSongs } from '../features/song/useSongs'
 import { BACKGROUNDS, DEFAULT_BACKGROUND } from '../features/background/backgrounds'
 import SlidesPanel from '../features/slides/SlidesPanel'
 import { useSlides } from '../features/slides/useSlides'
@@ -11,14 +12,20 @@ export default function Control() {
   const [mode, setMode] = useState('song')
 
   const {
-    sections,
+    songs,
+    openSongId,
+    openSong,
     activeSection,
     activationNonce,
-    setActiveId,
+    selectSong,
+    addSong,
+    removeSong,
+    updateSongTitle,
     addSection,
     updateSection,
     removeSection,
-  } = useSongSections({ enabled: mode === 'song' })
+    selectSection,
+  } = useSongs({ enabled: mode === 'song' })
 
   const {
     slides,
@@ -133,18 +140,36 @@ export default function Control() {
             </p>
           )}
 
-          <h2>Song sections</h2>
-          <SongEditor
-            sections={sections}
-            activeSection={activeSection}
-            onAddSection={addSection}
-            onUpdateSection={updateSection}
-            onRemoveSection={removeSection}
-            onSelectSection={setActiveId}
+          <h2>Songs</h2>
+          <SongList
+            songs={songs}
+            openSongId={openSongId}
+            onAddSong={addSong}
+            onSelectSong={selectSong}
+            onRemoveSong={removeSong}
+            onRenameSong={updateSongTitle}
           />
 
-          <h2>Live preview</h2>
-          <SongPreview activeSection={activeSection} />
+          {openSong ? (
+            <>
+              <h2>Song sections — {openSong.title}</h2>
+              <SongEditor
+                sections={openSong.sections}
+                activeSection={activeSection}
+                onAddSection={() => addSection(openSong.id)}
+                onUpdateSection={(sectionId, patch) =>
+                  updateSection(openSong.id, sectionId, patch)
+                }
+                onRemoveSection={(sectionId) => removeSection(openSong.id, sectionId)}
+                onSelectSection={(sectionId) => selectSection(openSong.id, sectionId)}
+              />
+
+              <h2>Live preview</h2>
+              <SongPreview activeSection={activeSection} />
+            </>
+          ) : (
+            <p>No song open — add one above.</p>
+          )}
         </>
       )}
 
