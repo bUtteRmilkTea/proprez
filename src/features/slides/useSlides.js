@@ -1,12 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { isEditableTarget } from '../../lib/isEditableTarget'
 
 let nextId = 1
-
-function isEditableTarget(target) {
-  if (!target) return false
-  const tag = target.tagName
-  return tag === 'INPUT' || tag === 'TEXTAREA' || target.isContentEditable
-}
 
 export function useSlides({ enabled }) {
   const [slides, setSlides] = useState([])
