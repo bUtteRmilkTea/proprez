@@ -1,11 +1,15 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { onMessage } from '../lib/channel'
 import BackgroundLayer from '../features/background/BackgroundLayer'
+import VideoBackground from '../features/background/VideoBackground'
 import { DEFAULT_BACKGROUND } from '../features/background/backgrounds'
 
 export default function Display() {
   const [text, setText] = useState('')
   const [background, setBackgroundState] = useState(DEFAULT_BACKGROUND)
+  const [backgroundMode, setBackgroundMode] = useState('generated')
+  const [videoUrl, setVideoUrl] = useState(null)
+  const videoUrlRef = useRef(null)
 
   useEffect(() => {
     return onMessage((message) => {
@@ -15,13 +19,35 @@ export default function Display() {
         setText('')
       } else if (message.type === 'setBackground') {
         setBackgroundState(message.background)
+      } else if (message.type === 'setBackgroundMode') {
+        setBackgroundMode(message.mode)
       }
     })
   }, [])
 
+  function handlePickVideo(event) {
+    const file = event.target.files[0]
+    if (!file) return
+    if (videoUrlRef.current) URL.revokeObjectURL(videoUrlRef.current)
+    const url = URL.createObjectURL(file)
+    videoUrlRef.current = url
+    setVideoUrl(url)
+  }
+
+  useEffect(() => {
+    return () => {
+      if (videoUrlRef.current) URL.revokeObjectURL(videoUrlRef.current)
+    }
+  }, [])
+
   return (
     <div style={{ position: 'fixed', inset: 0, background: 'black', overflow: 'hidden' }}>
-      <BackgroundLayer background={background} />
+      {backgroundMode === 'video' ? (
+        <VideoBackground src={videoUrl} />
+      ) : (
+        <BackgroundLayer background={background} />
+      )}
+
       <div
         style={{
           position: 'absolute',
@@ -42,6 +68,25 @@ export default function Display() {
       >
         {text}
       </div>
+
+      <label
+        style={{
+          position: 'absolute',
+          bottom: 8,
+          left: 8,
+          color: 'rgba(255,255,255,0.4)',
+          fontSize: 12,
+          fontFamily: 'sans-serif',
+        }}
+      >
+        Video file:{' '}
+        <input
+          type="file"
+          accept="video/*"
+          onChange={handlePickVideo}
+          style={{ fontSize: 12 }}
+        />
+      </label>
     </div>
   )
 }
