@@ -5,10 +5,12 @@ import VideoBackground from '../features/background/VideoBackground'
 import { DEFAULT_BACKGROUND } from '../features/background/backgrounds'
 
 export default function Display() {
+  const [mode, setMode] = useState('song')
   const [text, setText] = useState('')
   const [background, setBackgroundState] = useState(DEFAULT_BACKGROUND)
   const [backgroundMode, setBackgroundMode] = useState('generated')
   const [videoUrl, setVideoUrl] = useState(null)
+  const [imageSrc, setImageSrc] = useState(null)
   const videoUrlRef = useRef(null)
 
   useEffect(() => {
@@ -17,10 +19,15 @@ export default function Display() {
         setText(message.text)
       } else if (message.type === 'clear') {
         setText('')
+        setImageSrc(null)
       } else if (message.type === 'setBackground') {
         setBackgroundState(message.background)
       } else if (message.type === 'setBackgroundMode') {
         setBackgroundMode(message.mode)
+      } else if (message.type === 'setMode') {
+        setMode(message.mode)
+      } else if (message.type === 'showImage') {
+        setImageSrc(message.src)
       }
     })
   }, [])
@@ -39,6 +46,20 @@ export default function Display() {
       if (videoUrlRef.current) URL.revokeObjectURL(videoUrlRef.current)
     }
   }, [])
+
+  if (mode === 'slides') {
+    return (
+      <div style={{ position: 'fixed', inset: 0, background: 'black' }}>
+        {imageSrc && (
+          <img
+            src={imageSrc}
+            alt=""
+            style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+          />
+        )}
+      </div>
+    )
+  }
 
   return (
     <div style={{ position: 'fixed', inset: 0, background: 'black', overflow: 'hidden' }}>

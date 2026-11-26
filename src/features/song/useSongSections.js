@@ -12,7 +12,7 @@ function isEditableTarget(target) {
   return tag === 'INPUT' || tag === 'TEXTAREA' || target.isContentEditable
 }
 
-export function useSongSections() {
+export function useSongSections({ enabled = true } = {}) {
   const [sections, setSections] = useState([])
   const [activeId, setActiveIdRaw] = useState(null)
   const [activationNonce, setActivationNonce] = useState(0)
@@ -40,6 +40,7 @@ export function useSongSections() {
   }, [])
 
   useEffect(() => {
+    if (!enabled) return
     function handleKeyDown(event) {
       if (isEditableTarget(event.target)) return
       const match = sections.find(
@@ -49,7 +50,7 @@ export function useSongSections() {
     }
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [sections])
+  }, [sections, enabled])
 
   const activeSection = sections.find((section) => section.id === activeId) ?? null
 
