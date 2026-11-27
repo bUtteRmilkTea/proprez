@@ -12,6 +12,7 @@ export default function Display() {
   const [videoUrl, setVideoUrl] = useState(null)
   const [imageSrc, setImageSrc] = useState(null)
   const [cleared, setCleared] = useState(false)
+  const [fontSize, setFontSize] = useState(4)
   const videoUrlRef = useRef(null)
 
   useEffect(() => {
@@ -32,6 +33,8 @@ export default function Display() {
       } else if (message.type === 'showImage') {
         setImageSrc(message.src)
         setCleared(false)
+      } else if (message.type === 'setFontSize') {
+        setFontSize(message.fontSize)
       }
     })
   }, [])
@@ -87,7 +90,7 @@ export default function Display() {
           justifyContent: 'center',
           padding: '4rem',
           boxSizing: 'border-box',
-          fontSize: '4rem',
+          fontSize: `${fontSize}rem`,
           lineHeight: 1.3,
           fontFamily: 'sans-serif',
           textAlign: 'center',

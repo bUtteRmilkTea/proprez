@@ -50,6 +50,13 @@ export default function Control() {
 
   const [background, setBackground] = useState(DEFAULT_BACKGROUND)
   const [backgroundMode, setBackgroundModeState] = useState('generated')
+  const [fontSize, setFontSizeState] = useState(4)
+
+  function handleFontSizeChange(event) {
+    const next = Number(event.target.value)
+    setFontSizeState(next)
+    send({ type: 'setFontSize', fontSize: next })
+  }
 
   function handleModeChange(next) {
     setMode(next)
@@ -149,6 +156,19 @@ export default function Control() {
 
       {mode === 'song' && (
         <>
+          <h2>Font size</h2>
+          <label>
+            {fontSize}rem{' '}
+            <input
+              type="range"
+              min={2}
+              max={8}
+              step={0.5}
+              value={fontSize}
+              onChange={handleFontSizeChange}
+            />
+          </label>
+
           <h2>Background</h2>
           <div role="group" aria-label="Background mode">
             <label>
