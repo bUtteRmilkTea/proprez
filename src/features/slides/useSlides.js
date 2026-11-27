@@ -25,6 +25,17 @@ export function useSlides({ enabled }) {
     setActiveIndexRaw(null)
   }, [])
 
+  // Replaces the deck with already-rendered slide images (e.g. from a .pptx
+  // import), in the given order - no re-sorting, since they're already in
+  // presentation order.
+  const loadRenderedSlides = useCallback((entries) => {
+    setSlides((prev) => {
+      for (const slide of prev) URL.revokeObjectURL(slide.url)
+      return entries.map((entry) => ({ id: nextId++, name: entry.name, url: entry.url }))
+    })
+    setActiveIndexRaw(null)
+  }, [])
+
   useEffect(() => {
     return () => {
       for (const slide of slidesRef.current) URL.revokeObjectURL(slide.url)
@@ -71,6 +82,7 @@ export function useSlides({ enabled }) {
     activeSlide,
     activationNonce,
     loadFiles,
+    loadRenderedSlides,
     setActiveIndex,
   }
 }
