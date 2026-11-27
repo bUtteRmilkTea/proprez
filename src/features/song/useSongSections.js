@@ -1,15 +1,10 @@
 import { useCallback, useEffect, useState } from 'react'
+import { isEditableTarget } from '../../lib/isEditableTarget'
 
 let nextId = 1
 
 function makeSection() {
   return { id: nextId++, label: '', key: '', text: '' }
-}
-
-function isEditableTarget(target) {
-  if (!target) return false
-  const tag = target.tagName
-  return tag === 'INPUT' || tag === 'TEXTAREA' || target.isContentEditable
 }
 
 export function useSongSections({ enabled = true } = {}) {

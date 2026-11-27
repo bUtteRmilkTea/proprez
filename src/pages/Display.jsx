@@ -11,15 +11,18 @@ export default function Display() {
   const [backgroundMode, setBackgroundMode] = useState('generated')
   const [videoUrl, setVideoUrl] = useState(null)
   const [imageSrc, setImageSrc] = useState(null)
+  const [cleared, setCleared] = useState(false)
   const videoUrlRef = useRef(null)
 
   useEffect(() => {
     return onMessage((message) => {
       if (message.type === 'showText') {
         setText(message.text)
+        setCleared(false)
       } else if (message.type === 'clear') {
         setText('')
         setImageSrc(null)
+        setCleared(true)
       } else if (message.type === 'setBackground') {
         setBackgroundState(message.background)
       } else if (message.type === 'setBackgroundMode') {
@@ -28,8 +31,15 @@ export default function Display() {
         setMode(message.mode)
       } else if (message.type === 'showImage') {
         setImageSrc(message.src)
+        setCleared(false)
       }
     })
+  }, [])
+
+  useEffect(() => {
+    return () => {
+      if (videoUrlRef.current) URL.revokeObjectURL(videoUrlRef.current)
+    }
   }, [])
 
   function handlePickVideo(event) {
@@ -41,11 +51,9 @@ export default function Display() {
     setVideoUrl(url)
   }
 
-  useEffect(() => {
-    return () => {
-      if (videoUrlRef.current) URL.revokeObjectURL(videoUrlRef.current)
-    }
-  }, [])
+  if (cleared) {
+    return <div style={{ position: 'fixed', inset: 0, background: 'black' }} />
+  }
 
   if (mode === 'slides') {
     return (
