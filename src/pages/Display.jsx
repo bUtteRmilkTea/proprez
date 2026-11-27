@@ -4,12 +4,14 @@ import BackgroundLayer from '../features/background/BackgroundLayer'
 import VideoBackground from '../features/background/VideoBackground'
 import { DEFAULT_BACKGROUND } from '../features/background/backgrounds'
 import { DEFAULT_THEME } from '../features/background/themes'
+import { getBlob } from '../lib/mediaStore'
 
 export default function Display() {
   const [mode, setMode] = useState('song')
   const [text, setText] = useState('')
   const [background, setBackgroundState] = useState(DEFAULT_BACKGROUND)
   const [backgroundMode, setBackgroundMode] = useState('generated')
+  const [videoId, setVideoId] = useState(null)
   const [videoUrl, setVideoUrl] = useState(null)
   const [imageSrc, setImageSrc] = useState(null)
   const [cleared, setCleared] = useState(false)
@@ -30,6 +32,7 @@ export default function Display() {
         setBackgroundState(message.background)
       } else if (message.type === 'setBackgroundMode') {
         setBackgroundMode(message.mode)
+        if (message.videoId) setVideoId(message.videoId)
       } else if (message.type === 'setMode') {
         setMode(message.mode)
       } else if (message.type === 'showImage') {
@@ -43,20 +46,28 @@ export default function Display() {
     })
   }, [])
 
+  // Resolve the stored video Blob into a local object URL whenever the id
+  // changes (including after this tab reloads and re-receives the id).
+  useEffect(() => {
+    if (!videoId) return
+    let cancelled = false
+    getBlob(videoId).then((blob) => {
+      if (cancelled || !blob) return
+      if (videoUrlRef.current) URL.revokeObjectURL(videoUrlRef.current)
+      const url = URL.createObjectURL(blob)
+      videoUrlRef.current = url
+      setVideoUrl(url)
+    })
+    return () => {
+      cancelled = true
+    }
+  }, [videoId])
+
   useEffect(() => {
     return () => {
       if (videoUrlRef.current) URL.revokeObjectURL(videoUrlRef.current)
     }
   }, [])
-
-  function handlePickVideo(event) {
-    const file = event.target.files[0]
-    if (!file) return
-    if (videoUrlRef.current) URL.revokeObjectURL(videoUrlRef.current)
-    const url = URL.createObjectURL(file)
-    videoUrlRef.current = url
-    setVideoUrl(url)
-  }
 
   if (cleared) {
     return <div style={{ position: 'fixed', inset: 0, background: 'black' }} />
@@ -104,25 +115,6 @@ export default function Display() {
       >
         {text}
       </div>
-
-      <label
-        style={{
-          position: 'absolute',
-          bottom: 8,
-          left: 8,
-          color: 'rgba(255,255,255,0.4)',
-          fontSize: 12,
-          fontFamily: 'sans-serif',
-        }}
-      >
-        Video file:{' '}
-        <input
-          type="file"
-          accept="video/*"
-          onChange={handlePickVideo}
-          style={{ fontSize: 12 }}
-        />
-      </label>
     </div>
   )
 }

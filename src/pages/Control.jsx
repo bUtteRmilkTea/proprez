@@ -6,6 +6,7 @@ import SongList from '../features/song/SongList'
 import { useSongs } from '../features/song/useSongs'
 import { BACKGROUNDS, DEFAULT_BACKGROUND } from '../features/background/backgrounds'
 import { DEFAULT_THEME, THEMES } from '../features/background/themes'
+import { makeMediaId, putBlob } from '../lib/mediaStore'
 import SlidesPanel from '../features/slides/SlidesPanel'
 import { useSlides } from '../features/slides/useSlides'
 import { usePptxImport } from '../features/slides/usePptxImport'
@@ -121,6 +122,15 @@ export default function Control() {
     send({ type: 'setBackgroundMode', mode: nextBgMode })
   }
 
+  async function handlePickVideoFile(event) {
+    const file = event.target.files[0]
+    if (!file) return
+    const id = makeMediaId()
+    await putBlob(id, file)
+    setBackgroundModeState('video')
+    send({ type: 'setBackgroundMode', mode: 'video', videoId: id })
+  }
+
   return (
     <main style={{ padding: '2rem', fontFamily: 'sans-serif' }}>
       <h1>Control</h1>
@@ -233,9 +243,11 @@ export default function Control() {
             ))}
           </div>
           {backgroundMode === 'video' && (
-            <p style={{ color: '#666', fontSize: 14 }}>
-              Pick the video file directly on the /display window (file picker in its
-              bottom-left corner).
+            <p>
+              <label>
+                Video file:{' '}
+                <input type="file" accept="video/*" onChange={handlePickVideoFile} />
+              </label>
             </p>
           )}
 
