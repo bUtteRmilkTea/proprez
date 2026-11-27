@@ -13,7 +13,7 @@ export default function VideoBackground({ src }) {
           fontFamily: 'sans-serif',
         }}
       >
-        No video loaded — use the file picker in the corner
+        No video loaded — pick a video file on the Control page
       </div>
     )
   }
