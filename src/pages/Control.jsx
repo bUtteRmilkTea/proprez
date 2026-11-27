@@ -10,6 +10,8 @@ import { makeMediaId, putBlob } from '../lib/mediaStore'
 import SlidesPanel from '../features/slides/SlidesPanel'
 import { useSlides } from '../features/slides/useSlides'
 import { usePptxImport } from '../features/slides/usePptxImport'
+import MediaPanel from '../features/media/MediaPanel'
+import { useMedia } from '../features/media/useMedia'
 import { useGlobalShortcuts } from '../features/shortcuts/useGlobalShortcuts'
 import ConfirmDialog from '../components/ConfirmDialog'
 
@@ -50,6 +52,16 @@ export default function Control() {
     importPptx,
   } = usePptxImport()
 
+  const {
+    items: mediaItems,
+    activeIndex: mediaActiveIndex,
+    activeItem: activeMediaItem,
+    activationNonce: mediaActivationNonce,
+    loadFiles: loadMediaFiles,
+    setActiveIndex: setMediaActiveIndex,
+    updateItemShortcut: updateMediaItemShortcut,
+  } = useMedia({ enabled: mode === 'media' })
+
   const [background, setBackground] = useState(DEFAULT_BACKGROUND)
   const [backgroundMode, setBackgroundModeState] = useState('generated')
   const [fontSize, setFontSizeState] = useState(4)
@@ -87,6 +99,13 @@ export default function Control() {
       const nextIndex =
         activeIndex === null ? 0 : Math.min(slides.length - 1, Math.max(0, activeIndex + direction))
       setActiveIndex(nextIndex)
+    } else if (mode === 'media') {
+      if (mediaItems.length === 0) return
+      const nextIndex =
+        mediaActiveIndex === null
+          ? 0
+          : Math.min(mediaItems.length - 1, Math.max(0, mediaActiveIndex + direction))
+      setMediaActiveIndex(nextIndex)
     }
   }
 
@@ -110,6 +129,12 @@ export default function Control() {
       send({ type: 'showImage', src: activeSlide.url })
     }
   }, [mode, activeSlide, slideActivationNonce])
+
+  useEffect(() => {
+    if (mode === 'media' && activeMediaItem) {
+      send({ type: 'showMedia', mediaId: activeMediaItem.id, mediaType: activeMediaItem.type })
+    }
+  }, [mode, activeMediaItem, mediaActivationNonce])
 
   function handleBackgroundChange(event) {
     const next = event.target.value
@@ -168,6 +193,16 @@ export default function Control() {
             onChange={() => handleModeChange('slides')}
           />{' '}
           Slides
+        </label>{' '}
+        <label>
+          <input
+            type="radio"
+            name="mode"
+            value="media"
+            checked={mode === 'media'}
+            onChange={() => handleModeChange('media')}
+          />{' '}
+          Media
         </label>
       </div>
 
@@ -296,6 +331,19 @@ export default function Control() {
             pptxStatus={pptxStatus}
             pptxProgress={pptxProgress}
             pptxError={pptxError}
+          />
+        </>
+      )}
+
+      {mode === 'media' && (
+        <>
+          <h2>Media</h2>
+          <MediaPanel
+            items={mediaItems}
+            activeIndex={mediaActiveIndex}
+            onLoadFiles={loadMediaFiles}
+            onSelect={setMediaActiveIndex}
+            onUpdateShortcut={updateMediaItemShortcut}
           />
         </>
       )}
