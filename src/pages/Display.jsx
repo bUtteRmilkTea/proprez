@@ -6,6 +6,43 @@ import { DEFAULT_BACKGROUND } from '../features/background/backgrounds'
 import { DEFAULT_THEME } from '../features/background/themes'
 import { getBlob } from '../lib/mediaStore'
 
+function MediaContent({ mediaId, mediaType }) {
+  const [url, setUrl] = useState(null)
+
+  useEffect(() => {
+    if (!mediaId) return
+    let cancelled = false
+    let objectUrl = null
+    getBlob(mediaId).then((blob) => {
+      if (cancelled || !blob) return
+      objectUrl = URL.createObjectURL(blob)
+      setUrl(objectUrl)
+    })
+    return () => {
+      cancelled = true
+      if (objectUrl) URL.revokeObjectURL(objectUrl)
+    }
+  }, [mediaId])
+
+  if (!url) return null
+  if (mediaType === 'video') {
+    return (
+      <video
+        key={mediaId}
+        src={url}
+        autoPlay
+        loop
+        muted
+        playsInline
+        style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+      />
+    )
+  }
+  return (
+    <img src={url} alt="" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+  )
+}
+
 export default function Display() {
   const [mode, setMode] = useState('song')
   const [text, setText] = useState('')
@@ -14,6 +51,8 @@ export default function Display() {
   const [videoId, setVideoId] = useState(null)
   const [videoUrl, setVideoUrl] = useState(null)
   const [imageSrc, setImageSrc] = useState(null)
+  const [mediaId, setMediaId] = useState(null)
+  const [mediaType, setMediaType] = useState(null)
   const [cleared, setCleared] = useState(false)
   const [fontSize, setFontSize] = useState(4)
   const [theme, setTheme] = useState(DEFAULT_THEME)
@@ -27,6 +66,8 @@ export default function Display() {
       } else if (message.type === 'clear') {
         setText('')
         setImageSrc(null)
+        setMediaId(null)
+        setMediaType(null)
         setCleared(true)
       } else if (message.type === 'setBackground') {
         setBackgroundState(message.background)
@@ -42,6 +83,10 @@ export default function Display() {
         setFontSize(message.fontSize)
       } else if (message.type === 'setTheme') {
         setTheme(message.theme)
+      } else if (message.type === 'showMedia') {
+        setMediaId(message.mediaId)
+        setMediaType(message.mediaType)
+        setCleared(false)
       }
     })
   }, [])
@@ -83,6 +128,14 @@ export default function Display() {
             style={{ width: '100%', height: '100%', objectFit: 'contain' }}
           />
         )}
+      </div>
+    )
+  }
+
+  if (mode === 'media') {
+    return (
+      <div style={{ position: 'fixed', inset: 0, background: 'black' }}>
+        {mediaId && <MediaContent key={mediaId} mediaId={mediaId} mediaType={mediaType} />}
       </div>
     )
   }
