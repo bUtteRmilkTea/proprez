@@ -14,7 +14,15 @@ function isEditableTarget(target) {
 
 export function useSongSections() {
   const [sections, setSections] = useState([])
-  const [activeId, setActiveId] = useState(null)
+  const [activeId, setActiveIdRaw] = useState(null)
+  const [activationNonce, setActivationNonce] = useState(0)
+
+  // Bumps a nonce alongside the id so re-selecting the same section still
+  // re-broadcasts (needed to resync a /display that reloaded mid-session).
+  const setActiveId = useCallback((id) => {
+    setActiveIdRaw(id)
+    setActivationNonce((n) => n + 1)
+  }, [])
 
   const addSection = useCallback(() => {
     setSections((prev) => [...prev, makeSection()])
@@ -48,6 +56,7 @@ export function useSongSections() {
   return {
     sections,
     activeSection,
+    activationNonce,
     setActiveId,
     addSection,
     updateSection,

@@ -1,16 +1,15 @@
 import { useEffect, useState } from 'react'
 import { onMessage } from '../lib/channel'
 
-const PING_VISIBLE_MS = 1500
-
 export default function Display() {
-  const [showPing, setShowPing] = useState(false)
+  const [text, setText] = useState('')
 
   useEffect(() => {
     return onMessage((message) => {
-      if (message.type === 'ping') {
-        setShowPing(true)
-        setTimeout(() => setShowPing(false), PING_VISIBLE_MS)
+      if (message.type === 'showText') {
+        setText(message.text)
+      } else if (message.type === 'clear') {
+        setText('')
       }
     })
   }, [])
@@ -25,11 +24,16 @@ export default function Display() {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        fontSize: '3rem',
+        padding: '4rem',
+        boxSizing: 'border-box',
+        fontSize: '4rem',
+        lineHeight: 1.3,
         fontFamily: 'sans-serif',
+        textAlign: 'center',
+        whiteSpace: 'pre-wrap',
       }}
     >
-      {showPing ? 'PING RECEIVED' : null}
+      {text}
     </div>
   )
 }
