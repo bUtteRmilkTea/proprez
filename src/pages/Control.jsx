@@ -8,6 +8,7 @@ import { BACKGROUNDS, DEFAULT_BACKGROUND } from '../features/background/backgrou
 import SlidesPanel from '../features/slides/SlidesPanel'
 import { useSlides } from '../features/slides/useSlides'
 import { usePptxImport } from '../features/slides/usePptxImport'
+import { useGlobalShortcuts } from '../features/shortcuts/useGlobalShortcuts'
 
 export default function Control() {
   const [mode, setMode] = useState('song')
@@ -52,6 +53,34 @@ export default function Control() {
     setMode(next)
     send({ type: 'setMode', mode: next })
   }
+
+  function handleNavigate(direction) {
+    if (mode === 'song' && openSong) {
+      if (openSong.sections.length === 0) return
+      const currentIndex = openSong.sections.findIndex(
+        (section) => section.id === openSong.activeSectionId,
+      )
+      const nextIndex =
+        currentIndex === -1
+          ? 0
+          : Math.min(openSong.sections.length - 1, Math.max(0, currentIndex + direction))
+      selectSection(openSong.id, openSong.sections[nextIndex].id)
+    } else if (mode === 'slides') {
+      if (slides.length === 0) return
+      const nextIndex =
+        activeIndex === null ? 0 : Math.min(slides.length - 1, Math.max(0, activeIndex + direction))
+      setActiveIndex(nextIndex)
+    }
+  }
+
+  useGlobalShortcuts({
+    enabled: true,
+    onModeChange: handleModeChange,
+    songs,
+    openSongId,
+    onSelectSong: selectSong,
+    onNavigate: handleNavigate,
+  })
 
   useEffect(() => {
     if (mode === 'song' && activeSection) {

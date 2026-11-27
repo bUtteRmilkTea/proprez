@@ -1,11 +1,17 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { isEditableTarget } from '../../lib/isEditableTarget'
+import { emptyCombo, matchesCombo, nextAutoKey } from '../../lib/shortcuts'
 
 let nextSongId = 1
 let nextSectionId = 1
 
-function makeSection() {
-  return { id: nextSectionId++, label: '', key: '', text: '' }
+function makeSection(shortcutKey = '') {
+  return {
+    id: nextSectionId++,
+    label: '',
+    shortcut: { ...emptyCombo(), key: shortcutKey },
+    text: '',
+  }
 }
 
 // Manages a list of songs, each with its own sections (label/key/text).
@@ -44,9 +50,11 @@ export function useSongs({ enabled = true } = {}) {
 
   const addSection = useCallback((songId) => {
     setSongs((prev) =>
-      prev.map((song) =>
-        song.id === songId ? { ...song, sections: [...song.sections, makeSection()] } : song,
-      ),
+      prev.map((song) => {
+        if (song.id !== songId) return song
+        const autoKey = nextAutoKey(song.sections.map((section) => section.shortcut))
+        return { ...song, sections: [...song.sections, makeSection(autoKey)] }
+      }),
     )
   }, [])
 
@@ -94,9 +102,7 @@ export function useSongs({ enabled = true } = {}) {
       if (isEditableTarget(event.target)) return
       const song = songsRef.current.find((s) => s.id === openSongId)
       if (!song) return
-      const match = song.sections.find(
-        (section) => section.key && section.key.toLowerCase() === event.key.toLowerCase(),
-      )
+      const match = song.sections.find((section) => matchesCombo(event, section.shortcut))
       if (match) selectSection(song.id, match.id)
     }
     window.addEventListener('keydown', handleKeyDown)
