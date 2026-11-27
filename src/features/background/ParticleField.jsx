@@ -1,8 +1,10 @@
 import { useEffect, useRef } from 'react'
 
 const PARTICLE_COUNT = 80
+const DEFAULT_BACKGROUND = '#0a0a1a'
+const DEFAULT_COLOR = 'rgba(199, 210, 254, 0.8)'
 
-export default function ParticleField() {
+export default function ParticleField({ background = DEFAULT_BACKGROUND, color = DEFAULT_COLOR }) {
   const canvasRef = useRef(null)
 
   useEffect(() => {
@@ -27,9 +29,9 @@ export default function ParticleField() {
     }
 
     function tick() {
-      ctx.fillStyle = '#0a0a1a'
+      ctx.fillStyle = background
       ctx.fillRect(0, 0, canvas.width, canvas.height)
-      ctx.fillStyle = 'rgba(199, 210, 254, 0.8)'
+      ctx.fillStyle = color
       for (const p of particles) {
         p.x += p.vx
         p.y += p.vy
@@ -53,7 +55,7 @@ export default function ParticleField() {
       cancelAnimationFrame(frameId)
       window.removeEventListener('resize', resize)
     }
-  }, [])
+  }, [background, color])
 
   return (
     <canvas

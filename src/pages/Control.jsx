@@ -5,6 +5,7 @@ import SongPreview from '../features/song/SongPreview'
 import SongList from '../features/song/SongList'
 import { useSongs } from '../features/song/useSongs'
 import { BACKGROUNDS, DEFAULT_BACKGROUND } from '../features/background/backgrounds'
+import { DEFAULT_THEME, THEMES } from '../features/background/themes'
 import SlidesPanel from '../features/slides/SlidesPanel'
 import { useSlides } from '../features/slides/useSlides'
 import { usePptxImport } from '../features/slides/usePptxImport'
@@ -51,11 +52,17 @@ export default function Control() {
   const [background, setBackground] = useState(DEFAULT_BACKGROUND)
   const [backgroundMode, setBackgroundModeState] = useState('generated')
   const [fontSize, setFontSizeState] = useState(4)
+  const [theme, setThemeState] = useState(DEFAULT_THEME)
 
   function handleFontSizeChange(event) {
     const next = Number(event.target.value)
     setFontSizeState(next)
     send({ type: 'setFontSize', fontSize: next })
+  }
+
+  function handleThemeChange(nextTheme) {
+    setThemeState(nextTheme)
+    send({ type: 'setTheme', theme: nextTheme })
   }
 
   function handleModeChange(next) {
@@ -203,6 +210,28 @@ export default function Control() {
               </option>
             ))}
           </select>
+
+          <div role="group" aria-label="Background theme" style={{ marginTop: 8 }}>
+            {Object.entries(THEMES).map(([id, palette]) => (
+              <button
+                key={id}
+                type="button"
+                onClick={() => handleThemeChange(id)}
+                disabled={backgroundMode !== 'generated'}
+                aria-pressed={theme === id}
+                style={{
+                  marginRight: 6,
+                  padding: '4px 10px',
+                  border: theme === id ? '2px solid #333' : '1px solid #ccc',
+                  borderRadius: 4,
+                  background: palette.gradient[0],
+                  color: '#fff',
+                }}
+              >
+                {palette.label}
+              </button>
+            ))}
+          </div>
           {backgroundMode === 'video' && (
             <p style={{ color: '#666', fontSize: 14 }}>
               Pick the video file directly on the /display window (file picker in its

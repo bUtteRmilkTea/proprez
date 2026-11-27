@@ -3,6 +3,7 @@ import { onMessage } from '../lib/channel'
 import BackgroundLayer from '../features/background/BackgroundLayer'
 import VideoBackground from '../features/background/VideoBackground'
 import { DEFAULT_BACKGROUND } from '../features/background/backgrounds'
+import { DEFAULT_THEME } from '../features/background/themes'
 
 export default function Display() {
   const [mode, setMode] = useState('song')
@@ -13,6 +14,7 @@ export default function Display() {
   const [imageSrc, setImageSrc] = useState(null)
   const [cleared, setCleared] = useState(false)
   const [fontSize, setFontSize] = useState(4)
+  const [theme, setTheme] = useState(DEFAULT_THEME)
   const videoUrlRef = useRef(null)
 
   useEffect(() => {
@@ -35,6 +37,8 @@ export default function Display() {
         setCleared(false)
       } else if (message.type === 'setFontSize') {
         setFontSize(message.fontSize)
+      } else if (message.type === 'setTheme') {
+        setTheme(message.theme)
       }
     })
   }, [])
@@ -77,7 +81,7 @@ export default function Display() {
       {backgroundMode === 'video' ? (
         <VideoBackground src={videoUrl} />
       ) : (
-        <BackgroundLayer background={background} />
+        <BackgroundLayer background={background} theme={theme} />
       )}
 
       <div

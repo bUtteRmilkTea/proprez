@@ -1,7 +1,10 @@
-const SHAPES = [
-  { size: 260, top: '10%', left: '15%', color: 'rgba(59,130,246,0.35)', duration: '14s', delay: '0s' },
-  { size: 180, top: '60%', left: '70%', color: 'rgba(236,72,153,0.3)', duration: '20s', delay: '2s' },
-  { size: 320, top: '40%', left: '45%', color: 'rgba(16,185,129,0.25)', duration: '26s', delay: '4s' },
+const DEFAULT_COLORS = ['rgba(59,130,246,0.35)', 'rgba(236,72,153,0.3)', 'rgba(16,185,129,0.25)']
+const DEFAULT_BACKGROUND = '#0f172a'
+
+const SHAPE_LAYOUT = [
+  { size: 260, top: '10%', left: '15%', duration: '14s', delay: '0s' },
+  { size: 180, top: '60%', left: '70%', duration: '20s', delay: '2s' },
+  { size: 320, top: '40%', left: '45%', duration: '26s', delay: '4s' },
 ]
 
 const style = `
@@ -12,12 +15,12 @@ const style = `
 }
 `
 
-export default function MovingShapes() {
+export default function MovingShapes({ background = DEFAULT_BACKGROUND, colors = DEFAULT_COLORS }) {
   return (
     <>
       <style>{style}</style>
-      <div style={{ position: 'absolute', inset: 0, background: '#0f172a', overflow: 'hidden' }}>
-        {SHAPES.map((shape, i) => (
+      <div style={{ position: 'absolute', inset: 0, background, overflow: 'hidden' }}>
+        {SHAPE_LAYOUT.map((shape, i) => (
           <div
             key={i}
             style={{
@@ -27,7 +30,7 @@ export default function MovingShapes() {
               width: shape.size,
               height: shape.size,
               borderRadius: '50%',
-              background: shape.color,
+              background: colors[i % colors.length],
               filter: 'blur(20px)',
               animation: `proprez-shape-float ${shape.duration} ease-in-out infinite`,
               animationDelay: shape.delay,
