@@ -14,6 +14,7 @@ import MediaPanel from '../features/media/MediaPanel'
 import { useMedia } from '../features/media/useMedia'
 import { useGlobalShortcuts } from '../features/shortcuts/useGlobalShortcuts'
 import ConfirmDialog from '../components/ConfirmDialog'
+import ControlPreview from '../features/display/ControlPreview'
 
 export default function Control() {
   const [mode, setMode] = useState('song')
@@ -172,6 +173,9 @@ export default function Control() {
           setConfirmClearOpen(false)
         }}
       />
+
+      <h2>Audience display</h2>
+      <ControlPreview />
 
       <div role="group" aria-label="Mode">
         <label>
