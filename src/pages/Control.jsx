@@ -17,6 +17,7 @@ export default function Control() {
   } = useSongSections()
 
   const [background, setBackground] = useState(DEFAULT_BACKGROUND)
+  const [backgroundMode, setBackgroundModeState] = useState('generated')
 
   useEffect(() => {
     if (activeSection) {
@@ -30,6 +31,11 @@ export default function Control() {
     send({ type: 'setBackground', background: next })
   }
 
+  function handleBackgroundModeChange(mode) {
+    setBackgroundModeState(mode)
+    send({ type: 'setBackgroundMode', mode })
+  }
+
   return (
     <main style={{ padding: '2rem', fontFamily: 'sans-serif' }}>
       <h1>Control</h1>
@@ -38,13 +44,45 @@ export default function Control() {
       </button>
 
       <h2>Background</h2>
-      <select value={background} onChange={handleBackgroundChange}>
+      <div role="group" aria-label="Background mode">
+        <label>
+          <input
+            type="radio"
+            name="background-mode"
+            value="generated"
+            checked={backgroundMode === 'generated'}
+            onChange={() => handleBackgroundModeChange('generated')}
+          />{' '}
+          Generated
+        </label>{' '}
+        <label>
+          <input
+            type="radio"
+            name="background-mode"
+            value="video"
+            checked={backgroundMode === 'video'}
+            onChange={() => handleBackgroundModeChange('video')}
+          />{' '}
+          Video
+        </label>
+      </div>
+      <select
+        value={background}
+        onChange={handleBackgroundChange}
+        disabled={backgroundMode !== 'generated'}
+      >
         {BACKGROUNDS.map((bg) => (
           <option key={bg.id} value={bg.id}>
             {bg.label}
           </option>
         ))}
       </select>
+      {backgroundMode === 'video' && (
+        <p style={{ color: '#666', fontSize: 14 }}>
+          Pick the video file directly on the /display window (file picker in its bottom-left
+          corner).
+        </p>
+      )}
 
       <h2>Song sections</h2>
       <SongEditor
