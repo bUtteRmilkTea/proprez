@@ -15,6 +15,7 @@ import { useMedia } from '../features/media/useMedia'
 import { useGlobalShortcuts } from '../features/shortcuts/useGlobalShortcuts'
 import ConfirmDialog from '../components/ConfirmDialog'
 import ControlPreview from '../features/display/ControlPreview'
+import ShortcutsHelp from '../components/ShortcutsHelp'
 
 export default function Control() {
   const [mode, setMode] = useState('song')
@@ -77,6 +78,12 @@ export default function Control() {
   function handleThemeChange(nextTheme) {
     setThemeState(nextTheme)
     send({ type: 'setTheme', theme: nextTheme })
+    // A theme only shows up on an animated background - if "None" is
+    // selected, switch to the gradient animation so the theme is visible.
+    if (background === 'none') {
+      setBackground('gradient')
+      send({ type: 'setBackground', background: 'gradient' })
+    }
   }
 
   function handleModeChange(next) {
@@ -173,6 +180,8 @@ export default function Control() {
           setConfirmClearOpen(false)
         }}
       />
+
+      <ShortcutsHelp />
 
       <h2>Audience display</h2>
       <ControlPreview />
