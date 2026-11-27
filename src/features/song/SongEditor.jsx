@@ -1,3 +1,5 @@
+import ShortcutRecorder from '../../components/ShortcutRecorder'
+
 export default function SongEditor({
   sections,
   activeSection,
@@ -30,13 +32,9 @@ export default function SongEditor({
                 value={section.label}
                 onChange={(event) => onUpdateSection(section.id, { label: event.target.value })}
               />
-              <input
-                aria-label="Key binding"
-                placeholder="Key (e.g. 1)"
-                value={section.key}
-                maxLength={1}
-                onChange={(event) => onUpdateSection(section.id, { key: event.target.value })}
-                style={{ width: 48 }}
+              <ShortcutRecorder
+                combo={section.shortcut}
+                onChange={(shortcut) => onUpdateSection(section.id, { shortcut })}
               />
               <button type="button" onClick={() => onSelectSection(section.id)}>
                 Go live
