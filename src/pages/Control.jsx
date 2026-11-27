@@ -9,9 +9,11 @@ import SlidesPanel from '../features/slides/SlidesPanel'
 import { useSlides } from '../features/slides/useSlides'
 import { usePptxImport } from '../features/slides/usePptxImport'
 import { useGlobalShortcuts } from '../features/shortcuts/useGlobalShortcuts'
+import ConfirmDialog from '../components/ConfirmDialog'
 
 export default function Control() {
   const [mode, setMode] = useState('song')
+  const [confirmClearOpen, setConfirmClearOpen] = useState(false)
 
   const {
     songs,
@@ -108,9 +110,19 @@ export default function Control() {
   return (
     <main style={{ padding: '2rem', fontFamily: 'sans-serif' }}>
       <h1>Control</h1>
-      <button type="button" onClick={() => send({ type: 'clear' })}>
+      <button type="button" onClick={() => setConfirmClearOpen(true)}>
         Clear
       </button>
+      <ConfirmDialog
+        open={confirmClearOpen}
+        title="Clear display?"
+        message="This will blank the audience display."
+        onCancel={() => setConfirmClearOpen(false)}
+        onConfirm={() => {
+          send({ type: 'clear' })
+          setConfirmClearOpen(false)
+        }}
+      />
 
       <div role="group" aria-label="Mode">
         <label>
