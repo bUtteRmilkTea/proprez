@@ -21,6 +21,20 @@ export const RESERVED_COMBOS = [
   { key: 'ArrowRight', ctrl: false, shift: false, alt: false, meta: false },
 ]
 
+// Human-readable reference for the fixed global shortcuts (see
+// useGlobalShortcuts.js) - shown in the Control page's shortcuts help
+// panel. Does not include per-section/slide/media-item shortcuts, since
+// those are user-assigned and already shown inline next to each item.
+export const GLOBAL_SHORTCUTS = [
+  { combo: RESERVED_COMBOS[0], description: 'Switch to Song mode' },
+  { combo: RESERVED_COMBOS[1], description: 'Switch to Slides mode' },
+  { combo: RESERVED_COMBOS[2], description: 'Switch to Media mode' },
+  { combo: RESERVED_COMBOS[3], description: 'Previous song' },
+  { combo: RESERVED_COMBOS[4], description: 'Next song' },
+  { combo: RESERVED_COMBOS[5], description: 'Previous item (section / slide / media item)' },
+  { combo: RESERVED_COMBOS[6], description: 'Next item (section / slide / media item)' },
+]
+
 export function emptyCombo() {
   return { key: '', ctrl: false, shift: false, alt: false, meta: false }
 }

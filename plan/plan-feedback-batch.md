@@ -149,6 +149,17 @@ Phase 7 → Phase 8 → Phase 9 → Phase 10 → Phase 11 → Phase 12 → Phase
 
 Each phase only depends on the one(s) before it (and transitively, on Phases 0–6 in `plan/plan.md`, already built). Phase 13 benefits from Phases 9/10/12 already existing (more states to mirror) but is listed last mainly to have everything in place to verify against.
 
+## Phase 14 (post-review fixes) — Animated default background, video sound, shortcuts help
+
+**Context:** after Phases 7-13 shipped, the user reported three issues: the background looked static by default (themes only recolor an animation you had to separately opt into, and the default was "None"); background/media videos were hardcoded `muted`; and there was no on-screen reference for the fixed global shortcuts.
+
+- `src/features/background/backgrounds.js`: `DEFAULT_BACKGROUND` changed from `"none"` to `"gradient"`, so a theme is animated out of the box. `Control.jsx`'s `handleThemeChange` also auto-switches `background` from `"none"` to `"gradient"` if the operator had explicitly picked "None" before choosing a theme.
+- `VideoBackground.jsx` and `MediaContent.jsx`: removed the hardcoded `muted` attribute. Autoplay-with-sound is blocked by browsers without a prior user gesture on that page, so both now attempt an unmuted `play()`, fall back to muted (keeping the animation/loop working) if blocked, and show a small "Click to enable sound" button that unmutes on click (the click itself satisfies the browser's gesture requirement).
+- New `src/lib/shortcuts.js` export `GLOBAL_SHORTCUTS` (the fixed combos from the reserved-combos table, with human descriptions) and `src/components/ShortcutsHelp.jsx`, a collapsible `<details>` list mounted in `Control.jsx`. Deliberately excludes per-section/slide/media-item shortcuts (those are user-assigned and already shown inline next to each item); includes the Slides mode's fixed `1-9,0` digit-key convention as a plain row since it isn't a combo descriptor.
+- **Acceptance criteria:** opening `/control` fresh shows an animated gradient background immediately; picking any theme keeps it animated; a background/media video plays with sound when the browser allows it, otherwise plays muted with a working "Click to enable sound" button; Control has a visible, collapsible shortcuts reference listing only the global/fixed shortcuts.
+
+---
+
 ## Verification
 
 No test suite exists in this repo (`oxlint` is the only configured check). Per phase:
