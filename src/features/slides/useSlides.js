@@ -53,21 +53,6 @@ export function useSlides({ enabled }) {
         const digit = Number(event.key)
         const index = digit === 0 ? 9 : digit - 1
         if (index < current.length) setActiveIndex(index)
-        return
-      }
-
-      if (event.key === 'ArrowRight') {
-        setActiveIndexRaw((prevIndex) => {
-          const next = prevIndex === null ? 0 : Math.min(current.length - 1, prevIndex + 1)
-          setActivationNonce((n) => n + 1)
-          return next
-        })
-      } else if (event.key === 'ArrowLeft') {
-        setActiveIndexRaw((prevIndex) => {
-          const next = prevIndex === null ? 0 : Math.max(0, prevIndex - 1)
-          setActivationNonce((n) => n + 1)
-          return next
-        })
       }
     }
     window.addEventListener('keydown', handleKeyDown)

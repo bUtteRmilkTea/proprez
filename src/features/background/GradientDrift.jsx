@@ -6,7 +6,9 @@ const style = `
 }
 `
 
-export default function GradientDrift() {
+const DEFAULT_COLORS = ['#1e3a8a', '#6b21a8', '#be185d', '#1e3a8a']
+
+export default function GradientDrift({ colors = DEFAULT_COLORS }) {
   return (
     <>
       <style>{style}</style>
@@ -14,8 +16,7 @@ export default function GradientDrift() {
         style={{
           position: 'absolute',
           inset: 0,
-          background:
-            'linear-gradient(120deg, #1e3a8a, #6b21a8, #be185d, #1e3a8a)',
+          background: `linear-gradient(120deg, ${colors.join(', ')})`,
           backgroundSize: '400% 400%',
           animation: 'proprez-gradient-drift 18s ease infinite',
         }}

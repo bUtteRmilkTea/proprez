@@ -5,4 +5,4 @@ export const BACKGROUNDS = [
   { id: 'particles', label: 'Particle field' },
 ]
 
-export const DEFAULT_BACKGROUND = 'none'
+export const DEFAULT_BACKGROUND = 'gradient'
